@@ -1,0 +1,154 @@
+# Build output directories
+/bin
+/obj
+
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# Auto-generated files
+Generated\ Files/
+*.generated.cs
+
+# Visual Studio files
+.vscode/
+.vs/
+*.vcxproj.user
+*.vcxproj.filters
+.DS_Store
+
+# Rider IDE files
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Configuration files
+appsettings.Development.json
+appsettings.Production.json
+
+# Publish directory
+/Publish/
+
+# Logs
+*.log
+/logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+*.bak
+*.old
+
+# Debug and Release directories
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# NuGet packages
+*.nupkg
+*.nuget
+.nuget/
+
+# Entity Framework Core migration files
+Migrations/
+
+# Bundle output from webpack, rollup, etc.
+/dist/
+/build/
+
+# NPM packages and lock files
+node_modules/
+package-lock.json
+yarn.lock
+.pnp.*
+.pnp/
+
+# IDE settings and configurations
+.idea/
+*.DotSettings
+*.DotSettings.user
+
+# Visual Studio Code files
+.vscode/
+.history/
+*.code-workspace
+
+# Resharper files
+.ReSharper*/
+*.DotSettings.user
+
+# Rider files
+.idea/
+.idea_modules/
+.idea_modules.iml
+*.sln.iml
+*.sln.DotSettings
+
+# MacOS specific files
+*.DS_Store
+._*
+
+# Linux specific files
+*~
+
+# Windows specific files
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+*.user
+.idea_modules/
+.idea_modules.iml
+.idea.DotSettings
+
+# ASP.NET files
+wwwroot/node_modules
+wwwroot/dist
+
+# Local application configuration
+local.settings.json
+
+# Azure Functions local settings file
+local.settings.json
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# NFS mounts
+.vagrant/
+mnt/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+*.user
+.idea_modules/
+.idea_modules.iml
+.idea.DotSettings
+
+# SQL Server files
+*.mdf
+*.ldf
+*.ndf
