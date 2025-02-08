@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 
 namespace Symmetry.Sales.ChatBot.Core.Interfaces;
+
 public interface IDeleteContributorService
 {
   // This service and method exist to provide a place in which to fire domain events

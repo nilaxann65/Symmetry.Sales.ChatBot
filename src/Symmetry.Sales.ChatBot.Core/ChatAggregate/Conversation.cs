@@ -1,6 +1,8 @@
-﻿namespace Symmetry.Sales.ChatBot.Core.ChatAggregate;
+﻿using Ardalis.SharedKernel;
 
-public class Conversation
+namespace Symmetry.Sales.ChatBot.Core.ChatAggregate;
+
+public class Conversation : EntityBase
 {
   public List<Message> Messages { get; private set; } = [];
   public bool IsActive { get; private set; } = true;

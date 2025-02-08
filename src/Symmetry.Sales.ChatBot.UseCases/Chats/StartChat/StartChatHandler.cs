@@ -1,20 +1,19 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate.Specifications;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
 
-namespace Symmetry.Sales.ChatBot.UseCases.Chats.GenerateMessage;
+namespace Symmetry.Sales.ChatBot.UseCases.Chats.StartChat;
 
-public class GenerateMessageHandler(
+public class StartChatHandler(
   IRepository<Chat> repository,
   IMessageProcessingService messageProcessingService,
   IModels models
-) : ICommandHandler<GenerateMessageCommand, Result<string>>
+) : ICommandHandler<StartChatCommand, Result<string>>
 {
   public async Task<Result<string>> Handle(
-    GenerateMessageCommand request,
+    StartChatCommand request,
     CancellationToken cancellationToken
   )
   {
@@ -22,11 +21,9 @@ public class GenerateMessageHandler(
       new GetChatByContactIdSpec(request.contactId, request.chatOrigin),
       cancellationToken
     );
+    chat ??= new Chat(request.chatOrigin, request.contactId);
 
-    if (chat is null)
-      return Result.NotFound("Chat not found");
-
-    chat.AddUserMessage(request.UserMessage);
+    chat.InitConversation(request.UserMessage);
 
     var messageCompletionResult = await messageProcessingService.GenerateMessageAsync(
       chat.GetActiveConversation()!,
@@ -39,7 +36,7 @@ public class GenerateMessageHandler(
 
     chat.AddBotMessage(messageCompletionResult.Value.Content);
 
-    await repository.SaveChangesAsync(cancellationToken);
+    await repository.AddAsync(chat, cancellationToken);
 
     return Result<string>.Success(messageCompletionResult.Value.Content);
   }

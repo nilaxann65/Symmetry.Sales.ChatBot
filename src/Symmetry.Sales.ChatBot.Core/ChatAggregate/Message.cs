@@ -1,6 +1,8 @@
-﻿namespace Symmetry.Sales.ChatBot.Core.ChatAggregate;
+﻿using Ardalis.SharedKernel;
 
-public class Message
+namespace Symmetry.Sales.ChatBot.Core.ChatAggregate;
+
+public class Message : EntityBase
 {
   public DateTime Date { get; private set; }
   public string Content { get; private set; }

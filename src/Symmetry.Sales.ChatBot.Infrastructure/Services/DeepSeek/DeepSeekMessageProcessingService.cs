@@ -10,7 +10,7 @@ namespace Symmetry.Sales.ChatBot.Infrastructure.Services.DeepSeek;
 internal class DeepSeekMessageProcessingService(
   string apiKey,
   Logger<DeepSeekMessageProcessingService> logger
-) : IMessageProcessingService
+)
 {
   private readonly string ChatModel = "deepseek-chat";
 

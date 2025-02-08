@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Ardalis.Result;
+using Ardalis.SharedKernel;
+using Symmetry.Sales.ChatBot.Core.ChatAggregate;
 
 namespace Symmetry.Sales.ChatBot.UseCases.Chats.StartChat;
 
-public class StartChatCommand { }
+public record StartChatCommand(string UserMessage, string contactId, ChatOrigin chatOrigin)
+  : ICommand<Result<string>>;

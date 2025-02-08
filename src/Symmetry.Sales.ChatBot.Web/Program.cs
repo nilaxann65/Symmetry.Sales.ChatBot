@@ -6,12 +6,12 @@ using FastEndpoints.Swagger;
 using MediatR;
 using Serilog;
 using Serilog.Extensions.Logging;
-using Symmetry.Sales.ChatBot.Core.ContributorAggregate;
+using Symmetry.Sales.ChatBot.Core.ChatAggregate;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
 using Symmetry.Sales.ChatBot.Infrastructure;
 using Symmetry.Sales.ChatBot.Infrastructure.Data;
 using Symmetry.Sales.ChatBot.Infrastructure.Email;
-using Symmetry.Sales.ChatBot.UseCases.Contributors.Create;
+using Symmetry.Sales.ChatBot.UseCases.Chats.StartChat;
 
 var logger = Log.Logger = new LoggerConfiguration()
   .Enrich.FromLogContext()
@@ -23,8 +23,7 @@ logger.Information("Starting web host");
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
-var microsoftLogger = new SerilogLoggerFactory(logger)
-    .CreateLogger<Program>();
+var microsoftLogger = new SerilogLoggerFactory(logger).CreateLogger<Program>();
 
 // Configure Web Behavior
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -33,11 +32,12 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
   options.MinimumSameSitePolicy = SameSiteMode.None;
 });
 
-builder.Services.AddFastEndpoints()
-                .SwaggerDocument(o =>
-                {
-                  o.ShortSchemaNames = true;
-                });
+builder
+  .Services.AddFastEndpoints()
+  .SwaggerDocument(o =>
+  {
+    o.ShortSchemaNames = true;
+  });
 
 ConfigureMediatR();
 
@@ -71,8 +71,7 @@ else
   app.UseHsts();
 }
 
-app.UseFastEndpoints()
-    .UseSwaggerGen(); // Includes AddFileServer and static files middleware
+app.UseFastEndpoints().UseSwaggerGen(); // Includes AddFileServer and static files middleware
 
 app.UseHttpsRedirection();
 
@@ -102,10 +101,10 @@ static void SeedDatabase(WebApplication app)
 void ConfigureMediatR()
 {
   var mediatRAssemblies = new[]
-{
-  Assembly.GetAssembly(typeof(Contributor)), // Core
-  Assembly.GetAssembly(typeof(CreateContributorCommand)) // UseCases
-};
+  {
+    Assembly.GetAssembly(typeof(Chat)), // Core
+    Assembly.GetAssembly(typeof(StartChatCommand)) // UseCases
+  };
   builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!));
   builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
   builder.Services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
@@ -124,6 +123,4 @@ void AddShowAllServicesSupport()
 }
 
 // Make the implicit Program.cs class public, so integration tests can reference the correct assembly for host building
-public partial class Program
-{
-}
+public partial class Program { }

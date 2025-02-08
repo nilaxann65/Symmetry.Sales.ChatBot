@@ -7,13 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
-using Symmetry.Sales.ChatBot.Core.Services;
 using Symmetry.Sales.ChatBot.Infrastructure.Data;
-using Symmetry.Sales.ChatBot.Infrastructure.Data.Queries;
 using Symmetry.Sales.ChatBot.Infrastructure.Email;
-using Symmetry.Sales.ChatBot.Infrastructure.Services.ChatModels;
-using Symmetry.Sales.ChatBot.Infrastructure.Services.ChatModels.Config;
-using Symmetry.Sales.ChatBot.UseCases.Contributors.List;
+using Symmetry.Sales.ChatBot.Infrastructure.Services.SemanticKernel;
+using Symmetry.Sales.ChatBot.Infrastructure.Services.SemanticKernel.Config;
 
 namespace Symmetry.Sales.ChatBot.Infrastructure;
 
@@ -34,8 +31,6 @@ public static class InfrastructureServiceExtensions
 
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
     services.AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>));
-    services.AddScoped<IListContributorsQueryService, ListContributorsQueryService>();
-    services.AddScoped<IDeleteContributorService, DeleteContributorService>();
 
     services.Configure<MailserverConfiguration>(config.GetSection("Mailserver"));
 
@@ -53,16 +48,18 @@ public static class InfrastructureServiceExtensions
 
     services.AddSingleton<IModels, Models>();
 
+    var models = services.BuildServiceProvider().GetRequiredService<IModels>();
     Dictionary<string, SemanticKernelDetailOptions> options = configuration
       .GetSection("SemanticKernelModels")
       .Get<Dictionary<string, SemanticKernelDetailOptions>>()!;
 
     string geminiApiKey = options.GetValueOrDefault("gemini")?.ApiKey!;
-    string geminiModel = "gemini-1.5-flash-8b";
 
 #pragma warning disable SKEXP0070
-    services.AddGoogleAIGeminiChatCompletion(geminiModel, geminiApiKey);
+    services.AddGoogleAIGeminiChatCompletion(models.Chat, geminiApiKey);
 #pragma warning restore SKEXP0070
+
+    services.AddScoped<IMessageProcessingService, SemanticKernelService>();
     return services;
   }
 }
