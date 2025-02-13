@@ -1,4 +1,5 @@
-﻿using Ardalis.GuardClauses;
+﻿using System.Net.Http.Headers;
+using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
@@ -6,9 +7,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.Google;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
 using Symmetry.Sales.ChatBot.Infrastructure.Data;
 using Symmetry.Sales.ChatBot.Infrastructure.Email;
+using Symmetry.Sales.ChatBot.Infrastructure.Services.MessagingServices.WhatsappService;
+using Symmetry.Sales.ChatBot.Infrastructure.Services.Meta.Config;
 using Symmetry.Sales.ChatBot.Infrastructure.Services.SemanticKernel;
 using Symmetry.Sales.ChatBot.Infrastructure.Services.SemanticKernel.Config;
 
@@ -34,7 +38,28 @@ public static class InfrastructureServiceExtensions
 
     services.Configure<MailserverConfiguration>(config.GetSection("Mailserver"));
 
+    services.AddMetaServices(config);
+
     logger.LogInformation("{Project} services registered", "Infrastructure");
+
+    return services;
+  }
+
+  public static IServiceCollection AddMetaServices(
+    this IServiceCollection services,
+    IConfiguration configuration
+  )
+  {
+    var metaOptions = configuration.GetSection("MetaOptions").Get<MetaOptions>()!;
+
+    services.AddHttpClient<IMessagingService, WhatsappMessagingService>(s =>
+    {
+      s.BaseAddress = new Uri(metaOptions.Url);
+      s.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+        "Bearer",
+        metaOptions.Token
+      );
+    });
 
     return services;
   }
@@ -57,6 +82,11 @@ public static class InfrastructureServiceExtensions
 
 #pragma warning disable SKEXP0070
     services.AddGoogleAIGeminiChatCompletion(models.Chat, geminiApiKey);
+    var config = new GeminiSafetySetting(
+      GeminiSafetyCategory.Dangerous,
+      GeminiSafetyThreshold.BlockMediumAndAbove
+    );
+
 #pragma warning restore SKEXP0070
 
     services.AddScoped<IMessageProcessingService, SemanticKernelService>();

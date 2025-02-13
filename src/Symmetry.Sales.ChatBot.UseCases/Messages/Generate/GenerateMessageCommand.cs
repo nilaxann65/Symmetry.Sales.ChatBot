@@ -2,9 +2,9 @@
 using Ardalis.SharedKernel;
 using Symmetry.Sales.ChatBot.Core.BusinessAggregate;
 
-namespace Symmetry.Sales.ChatBot.UseCases.Chats.StartChat;
+namespace Symmetry.Sales.ChatBot.UseCases.Messages.Generate;
 
-public record StartChatCommand(
+public record GenerateMessageCommand(
   string UserMessage,
   string contactId,
   Channel chatOrigin,

@@ -20,8 +20,6 @@ public class Conversation : EntityBase
     );
   }
 
-  private Conversation() { }
-
   public void AddBotMessage(string content) =>
     Messages.Add(new Message(content, MessageSender.Bot));
 
@@ -29,4 +27,7 @@ public class Conversation : EntityBase
     Messages.Add(new Message(content, MessageSender.User));
 
   public void CloseConversation() => IsActive = false;
+
+  // Required for EF
+  private Conversation() { }
 }

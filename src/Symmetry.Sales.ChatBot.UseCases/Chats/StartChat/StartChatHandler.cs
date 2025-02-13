@@ -17,11 +17,7 @@ public class StartChatHandler(
     CancellationToken cancellationToken
   )
   {
-    var chat = await repository.FirstOrDefaultAsync(
-      new GetChatByContactIdSpec(request.contactId, request.chatOrigin),
-      cancellationToken
-    );
-    chat ??= new Chat(request.chatOrigin, request.contactId);
+    var chat = new Chat(request.chatOrigin, request.contactId, request.tenantId);
 
     chat.InitConversation(request.UserMessage);
 

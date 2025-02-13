@@ -1,22 +1,20 @@
 ﻿using Ardalis.SharedKernel;
+using Symmetry.Sales.ChatBot.Core.BusinessAggregate;
 
 namespace Symmetry.Sales.ChatBot.Core.ChatAggregate;
 
 public class Chat : EntityBase, IAggregateRoot
 {
-  public ChatOrigin Origin { get; private set; }
+  public int TenantId { get; private set; }
+  public Channel Origin { get; private set; }
   public string ContactId { get; private set; }
   public List<Conversation> Conversations { get; private set; } = [];
 
-  private Chat()
-  {
-    ContactId = string.Empty;
-  }
-
-  public Chat(ChatOrigin origin, string contactId)
+  public Chat(Channel origin, string contactId, int tenantId)
   {
     Origin = origin;
     ContactId = contactId;
+    TenantId = tenantId;
   }
 
   public void InitConversation(string userMessage)
@@ -44,5 +42,11 @@ public class Chat : EntityBase, IAggregateRoot
   {
     var conversation = GetActiveConversation();
     conversation?.AddUserMessage(content);
+  }
+
+  // Required for EF
+  private Chat()
+  {
+    ContactId = string.Empty;
   }
 }

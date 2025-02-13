@@ -32,6 +32,16 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
   options.MinimumSameSitePolicy = SameSiteMode.None;
 });
 
+builder.Services.AddCors(options =>
+{
+  options.AddPolicy(
+    "AllowAll",
+    policy =>
+    {
+      policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    }
+  );
+});
 builder
   .Services.AddFastEndpoints()
   .SwaggerDocument(o =>
@@ -70,6 +80,8 @@ else
   app.UseDefaultExceptionHandler(); // from FastEndpoints
   app.UseHsts();
 }
+
+app.UseCors("AllowAll");
 
 app.UseFastEndpoints().UseSwaggerGen(); // Includes AddFileServer and static files middleware
 

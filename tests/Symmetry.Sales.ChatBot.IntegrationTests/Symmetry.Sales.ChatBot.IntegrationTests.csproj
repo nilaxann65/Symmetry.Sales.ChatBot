@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Symmetry.Sales.ChatBot.Infrastructure\Symmetry.Sales.ChatBot.Infrastructure.csproj" />
-    <ProjectReference Include="..\Symmetry.Sales.ChatBot.UnitTests\Symmetry.Sales.ChatBot.UnitTests.csproj" />
   </ItemGroup>
 
   <ItemGroup>

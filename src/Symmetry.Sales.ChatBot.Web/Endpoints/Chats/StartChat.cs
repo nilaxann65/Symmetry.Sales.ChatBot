@@ -19,7 +19,12 @@ public class StartChat(IMediator mediator) : Endpoint<StartChatRequest, StartCha
 
   public override async Task HandleAsync(StartChatRequest req, CancellationToken ct)
   {
-    var command = new StartChatCommand(req.UserMessage, req.ContactId, req.ChatOrigin);
+    var command = new StartChatCommand(
+      req.UserMessage,
+      req.ContactId,
+      req.ChatOrigin,
+      req.TenantId
+    );
 
     var response = await mediator.Send(command, ct);
 

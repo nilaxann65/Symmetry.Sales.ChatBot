@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 using MediatR;
-using Symmetry.Sales.ChatBot.UseCases.Chats.GenerateMessage;
+using Symmetry.Sales.ChatBot.UseCases.Messages.Generate;
 
 namespace Symmetry.Sales.ChatBot.Web.Endpoints.Chats;
 
@@ -20,7 +20,12 @@ public class GenerateMessage(IMediator mediator)
 
   public override async Task HandleAsync(GenerateMessageRequest req, CancellationToken ct)
   {
-    var command = new GenerateMessageCommand(req.UserMessage, req.ContactId, req.ChatOrigin);
+    var command = new GenerateMessageCommand(
+      req.UserMessage,
+      req.ContactId,
+      req.ChatOrigin,
+      req.TenantId
+    );
 
     var response = await mediator.Send(command, ct);
 

@@ -1,11 +1,10 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate.Specifications;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
 
-namespace Symmetry.Sales.ChatBot.UseCases.Chats.GenerateMessage;
+namespace Symmetry.Sales.ChatBot.UseCases.Messages.Generate;
 
 public class GenerateMessageHandler(
   IRepository<Chat> repository,
@@ -19,7 +18,7 @@ public class GenerateMessageHandler(
   )
   {
     var chat = await repository.FirstOrDefaultAsync(
-      new GetChatByContactIdSpec(request.contactId, request.chatOrigin),
+      new GetChatByContactIdSpec(request.contactId, request.chatOrigin, request.tenantId),
       cancellationToken
     );
 

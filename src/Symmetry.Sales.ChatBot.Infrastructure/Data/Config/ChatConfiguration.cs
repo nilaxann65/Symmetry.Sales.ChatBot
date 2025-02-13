@@ -8,6 +8,8 @@ public class ChatConfiguration : IEntityTypeConfiguration<Chat>
 {
   public void Configure(EntityTypeBuilder<Chat> builder)
   {
+    builder.Property(p => p.TenantId).IsRequired();
+
     builder.Property(p => p.Origin).IsRequired();
 
     builder.Property(p => p.ContactId).HasMaxLength(64).IsRequired();
