@@ -8,6 +8,8 @@ public class ChatConfiguration : IEntityTypeConfiguration<Chat>
 {
   public void Configure(EntityTypeBuilder<Chat> builder)
   {
+    builder.HasKey(p => p.Id);
+
     builder.Property(p => p.TenantId).IsRequired();
 
     builder.Property(p => p.Origin).IsRequired();

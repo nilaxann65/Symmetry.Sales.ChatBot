@@ -15,14 +15,21 @@
     <PackageReference Include="FastEndpoints" />
     <PackageReference Include="FastEndpoints.Swagger" />
     <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+    <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" PrivateAssets="All" />
     <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.ApplicationInsights" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Symmetry.Sales.ChatBot.Infrastructure\Symmetry.Sales.ChatBot.Infrastructure.csproj" />
     <ProjectReference Include="..\Symmetry.Sales.ChatBot.UseCases\Symmetry.Sales.ChatBot.UseCases.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Endpoints\Chats\" />
   </ItemGroup>
 
 </Project>

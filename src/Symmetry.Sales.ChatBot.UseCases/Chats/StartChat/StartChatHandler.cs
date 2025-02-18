@@ -6,13 +6,10 @@ using Symmetry.Sales.ChatBot.Core.Interfaces;
 
 namespace Symmetry.Sales.ChatBot.UseCases.Chats.StartChat;
 
-public class StartChatHandler(
-  IRepository<Chat> repository,
-  IMessageProcessingService messageProcessingService,
-  IModels models
-) : ICommandHandler<StartChatCommand, Result<string>>
+public class StartChatHandler(IMessageProcessingService messageProcessingService, IModels models)
+  : ICommandHandler<StartChatCommand, Result<Chat>>
 {
-  public async Task<Result<string>> Handle(
+  public async Task<Result<Chat>> Handle(
     StartChatCommand request,
     CancellationToken cancellationToken
   )
@@ -28,12 +25,10 @@ public class StartChatHandler(
     );
 
     if (!messageCompletionResult.IsSuccess)
-      return messageCompletionResult.Map(result => result.Content);
+      return messageCompletionResult.Map(result => new Chat(default, string.Empty, default));
 
     chat.AddBotMessage(messageCompletionResult.Value.Content);
 
-    await repository.AddAsync(chat, cancellationToken);
-
-    return Result<string>.Success(messageCompletionResult.Value.Content);
+    return Result.Success(chat);
   }
 }

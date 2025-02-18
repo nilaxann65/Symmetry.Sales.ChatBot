@@ -1,12 +1,7 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Symmetry.Sales.ChatBot.Core.BusinessAggregate;
+using Symmetry.Sales.ChatBot.Core.ChatAggregate;
 
 namespace Symmetry.Sales.ChatBot.UseCases.Messages.Generate;
 
-public record GenerateMessageCommand(
-  string UserMessage,
-  string contactId,
-  Channel chatOrigin,
-  int tenantId
-) : ICommand<Result<string>>;
+public record GenerateMessageCommand(Chat chat) : ICommand<Result<string>>;

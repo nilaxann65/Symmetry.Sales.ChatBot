@@ -8,7 +8,8 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
 {
   public void Configure(EntityTypeBuilder<Message> builder)
   {
-    builder.Property(p => p.Date).IsRequired();
+    builder.HasKey(p => p.Id);
+    builder.Property(p => p.Date).IsRequired().HasColumnType("timestamp");
     builder.Property(p => p.Content).IsRequired();
     builder.Property(p => p.Sender).IsRequired();
   }

@@ -8,6 +8,8 @@ public class ConversationConfiguration : IEntityTypeConfiguration<Conversation>
 {
   public void Configure(EntityTypeBuilder<Conversation> builder)
   {
+    builder.HasKey(p => p.Id);
+
     builder.Property(p => p.IsActive).IsRequired();
 
     builder

@@ -1,29 +1,28 @@
 ﻿using System.Reflection;
+using System.Text;
 using Ardalis.ListStartupServices;
 using Ardalis.SharedKernel;
+using Destructurama;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using MediatR;
+using Microsoft.ApplicationInsights.Extensibility;
 using Serilog;
-using Serilog.Extensions.Logging;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
 using Symmetry.Sales.ChatBot.Infrastructure;
 using Symmetry.Sales.ChatBot.Infrastructure.Data;
 using Symmetry.Sales.ChatBot.Infrastructure.Email;
 using Symmetry.Sales.ChatBot.UseCases.Chats.StartChat;
-
-var logger = Log.Logger = new LoggerConfiguration()
-  .Enrich.FromLogContext()
-  .WriteTo.Console()
-  .CreateLogger();
-
-logger.Information("Starting web host");
+using Symmetry.Sales.ChatBot.Web.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
-var microsoftLogger = new SerilogLoggerFactory(logger).CreateLogger<Program>();
+builder.Host.UseSerilog();
+
+var connectionStringAzureApp = builder.Configuration.GetValue<string>(
+  "AzureAppConfiguration:AppConfig"
+);
 
 // Configure Web Behavior
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -49,9 +48,15 @@ builder
     o.ShortSchemaNames = true;
   });
 
+builder.Services.AddApplicationInsightsTelemetry();
+
+builder.Services.Configure<TelemetryConfiguration>(options =>
+  options.TelemetryInitializers.Add(new AppInsightsTelemetryInitializer())
+);
+
 ConfigureMediatR();
 
-builder.Services.AddInfrastructureServices(builder.Configuration, microsoftLogger);
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 if (builder.Environment.IsDevelopment())
 {
@@ -69,6 +74,18 @@ else
 }
 
 var app = builder.Build();
+
+Log.Logger = new LoggerConfiguration()
+  .ReadFrom.Configuration(builder.Configuration)
+  .Enrich.FromLogContext()
+  .WriteTo.Console()
+  .WriteTo.ApplicationInsights(
+    app.Services.GetRequiredService<TelemetryConfiguration>(),
+    TelemetryConverter.Traces
+  )
+  .Destructure.ByTransforming<IMediator>(mediator => new { }) // Evita loguear los campos de IMediator
+  .Destructure.UsingAttributes()
+  .CreateLogger();
 
 if (app.Environment.IsDevelopment())
 {

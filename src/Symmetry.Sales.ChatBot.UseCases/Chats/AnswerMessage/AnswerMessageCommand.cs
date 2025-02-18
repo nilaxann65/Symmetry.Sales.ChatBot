@@ -9,4 +9,4 @@ public record AnswerMessageCommand(
   string destinataryId,
   Channel channel,
   string userMessage
-) : ICommand<Result<string>>;
+) : ICommand<Result>;

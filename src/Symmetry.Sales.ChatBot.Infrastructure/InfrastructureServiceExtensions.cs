@@ -2,15 +2,15 @@
 using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
 using Symmetry.Sales.ChatBot.Infrastructure.Data;
 using Symmetry.Sales.ChatBot.Infrastructure.Email;
+using Symmetry.Sales.ChatBot.Infrastructure.SemanticServices;
 using Symmetry.Sales.ChatBot.Infrastructure.Services.MessagingServices.WhatsappService;
 using Symmetry.Sales.ChatBot.Infrastructure.Services.Meta.Config;
 using Symmetry.Sales.ChatBot.Infrastructure.Services.SemanticKernel;
@@ -22,16 +22,18 @@ public static class InfrastructureServiceExtensions
 {
   public static IServiceCollection AddInfrastructureServices(
     this IServiceCollection services,
-    ConfigurationManager config,
-    ILogger logger
+    ConfigurationManager config
   )
   {
-    string? connectionString = config.GetConnectionString("SqliteConnection");
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    string? connectionString = config.GetConnectionString("DefaultConnection");
     Guard.Against.Null(connectionString);
 
     services.AddSemanticKernel(config);
 
-    services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+    services.AddDbContext<AppDbContext>(options =>
+      options.UseNpgsql(connectionString, s => s.MigrationsAssembly("Symmetry.Sales.ChatBot.Web"))
+    );
 
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
     services.AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>));
@@ -39,8 +41,6 @@ public static class InfrastructureServiceExtensions
     services.Configure<MailserverConfiguration>(config.GetSection("Mailserver"));
 
     services.AddMetaServices(config);
-
-    logger.LogInformation("{Project} services registered", "Infrastructure");
 
     return services;
   }
@@ -69,10 +69,9 @@ public static class InfrastructureServiceExtensions
     IConfiguration configuration
   )
   {
-    services.AddKernel();
-
     services.AddSingleton<IModels, Models>();
 
+    //#region models
     var models = services.BuildServiceProvider().GetRequiredService<IModels>();
     Dictionary<string, SemanticKernelDetailOptions> options = configuration
       .GetSection("SemanticKernelModels")
@@ -80,16 +79,37 @@ public static class InfrastructureServiceExtensions
 
     string geminiApiKey = options.GetValueOrDefault("gemini")?.ApiKey!;
 
+    string deepseekApiKey = options.GetValueOrDefault("deepseek")?.ApiKey!;
+
 #pragma warning disable SKEXP0070
-    services.AddGoogleAIGeminiChatCompletion(models.Chat, geminiApiKey);
-    var config = new GeminiSafetySetting(
-      GeminiSafetyCategory.Dangerous,
-      GeminiSafetyThreshold.BlockMediumAndAbove
-    );
 
+    services.AddSingleton<IChatCompletionService>(sp =>
+    {
+      return new GoogleAIGeminiChatCompletionService(models.Chat, geminiApiKey);
+    });
+#pragma warning disable SKEXP0001
+    //var memory = new MemoryBuilder()
+    //  .WithGoogleAITextEmbeddingGeneration("text-embedding-004", geminiApiKey)
+    //  .Build();
+#pragma warning restore SKEXP0001
 #pragma warning restore SKEXP0070
+    //#endregion
 
-    services.AddScoped<IMessageProcessingService, SemanticKernelService>();
+    #region Plugins
+
+    services.AddSingleton<InventoryPlugin>();
+
+    services.AddTransient(sp =>
+    {
+      KernelPluginCollection pluginCollection = [];
+      pluginCollection.AddFromObject(sp.GetRequiredService<InventoryPlugin>());
+
+      return new Kernel(sp, pluginCollection);
+    });
+
+    #endregion
+
+    services.AddTransient<IMessageProcessingService, SemanticKernelService>();
     return services;
   }
 }

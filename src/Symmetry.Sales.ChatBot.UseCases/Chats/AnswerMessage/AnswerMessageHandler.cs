@@ -1,4 +1,5 @@
-﻿using Ardalis.Result;
+﻿using System.Transactions;
+using Ardalis.Result;
 using Ardalis.SharedKernel;
 using MediatR;
 using Symmetry.Sales.ChatBot.Core.BusinessAggregate;
@@ -16,9 +17,9 @@ internal class AnswerMessageHandler(
   IRepository<Business> businessRepository,
   IMediator mediator,
   IMessagingService messagingService
-) : ICommandHandler<AnswerMessageCommand, Result<string>>
+) : ICommandHandler<AnswerMessageCommand, Result>
 {
-  public async Task<Result<string>> Handle(
+  public async Task<Result> Handle(
     AnswerMessageCommand request,
     CancellationToken cancellationToken
   )
@@ -31,13 +32,12 @@ internal class AnswerMessageHandler(
     if (business is null)
       return Result.NotFound("Business not found");
 
-    var chatExists = await chatRepository.AnyAsync(
+    var chat = await chatRepository.FirstOrDefaultAsync(
       new GetChatByContactIdSpec(request.sender, request.channel, business.Id),
       cancellationToken
     );
 
-    string generatedMessage = string.Empty;
-    if (!chatExists)
+    if (chat is null)
     {
       var response = await mediator.Send(
         new StartChatCommand(request.userMessage, request.sender, request.channel, business.Id),
@@ -45,26 +45,32 @@ internal class AnswerMessageHandler(
       );
 
       if (!response.IsSuccess)
-        return response.Map(result => result);
+        return response.Map(result => Result.Error(response.Errors.First()));
 
-      generatedMessage = response.Value;
+      try
+      {
+        chat = response.Value;
+        await chatRepository.AddAsync(chat, cancellationToken);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine(ex.Message);
+        throw;
+      }
     }
     else
     {
-      var response = await mediator.Send(
-        new GenerateMessageCommand(
-          request.userMessage,
-          request.sender,
-          request.channel,
-          business.Id
-        ),
-        cancellationToken
-      );
+      if (chat.HasActiveConversation())
+        chat.AddUserMessage(request.userMessage);
+      else
+        chat.InitConversation(request.userMessage);
+
+      var response = await mediator.Send(new GenerateMessageCommand(chat), cancellationToken);
 
       if (!response.IsSuccess)
-        return response.Map(result => result);
+        return response.Map(result => Result.Error(response.Errors.First()));
 
-      generatedMessage = response.Value;
+      chat.AddBotMessage(response.Value);
     }
 
     var messageSendResult = await messagingService.SendTextMessageAsync(
@@ -75,7 +81,7 @@ internal class AnswerMessageHandler(
         .First()
         .ContactId,
       request.sender,
-      generatedMessage,
+      chat.GetBotGeneratedMessage(),
       false,
       cancellationToken
     );
@@ -83,6 +89,11 @@ internal class AnswerMessageHandler(
     if (!messageSendResult.IsSuccess)
       return Result.Error("Error sending generated message");
 
-    return generatedMessage;
+    if (chat.Id == 0)
+      await chatRepository.AddAsync(chat, cancellationToken);
+    else
+      await chatRepository.SaveChangesAsync(cancellationToken);
+
+    return Result.Success();
   }
 }

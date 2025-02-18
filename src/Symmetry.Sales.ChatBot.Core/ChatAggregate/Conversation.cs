@@ -20,6 +20,9 @@ public class Conversation : EntityBase
     );
   }
 
+  public string GetBotGeneratedMessage() =>
+    Messages.LastOrDefault(d => d.Sender == MessageSender.Bot)?.Content ?? string.Empty;
+
   public void AddBotMessage(string content) =>
     Messages.Add(new Message(content, MessageSender.Bot));
 

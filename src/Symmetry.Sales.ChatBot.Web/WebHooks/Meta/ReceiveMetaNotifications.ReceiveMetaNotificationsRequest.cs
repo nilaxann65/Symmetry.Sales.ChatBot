@@ -25,6 +25,7 @@ public class Value
   public Metadata Metadata { get; set; } = new();
   public IEnumerable<Contact> Contacts { get; set; } = [];
   public IEnumerable<Message> Messages { get; set; } = [];
+  public IEnumerable<StatusRequest> Statuses { get; set; } = [];
 }
 
 public class Metadata
@@ -56,4 +57,33 @@ public class Message
 public class Text
 {
   public string Body { get; set; } = string.Empty;
+}
+
+public class StatusRequest
+{
+  public string Id { get; set; } = string.Empty;
+  public string Status { get; set; } = string.Empty;
+  public string Timestamp { get; set; } = string.Empty;
+  public string Recipient_Id { get; set; } = string.Empty;
+  public Conversation Conversation { get; set; } = new();
+  public Pricing Pricing { get; set; } = new();
+}
+
+public class Conversation
+{
+  public string Id { get; set; } = string.Empty;
+  public string Expiration_Timestamp { get; set; } = string.Empty;
+  public Origin Origin { get; set; } = new();
+}
+
+public class Origin
+{
+  public string Type { get; set; } = string.Empty;
+}
+
+public class Pricing
+{
+  public bool Billable { get; set; }
+  public string Pricing_Model { get; set; } = string.Empty;
+  public string Category { get; set; } = string.Empty;
 }

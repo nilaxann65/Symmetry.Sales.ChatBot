@@ -17,6 +17,8 @@ public class Chat : EntityBase, IAggregateRoot
     TenantId = tenantId;
   }
 
+  public bool HasActiveConversation() => Conversations.Any(d => d.IsActive);
+
   public void InitConversation(string userMessage)
   {
     foreach (var conversation in Conversations.Where(d => d.IsActive))
@@ -42,6 +44,12 @@ public class Chat : EntityBase, IAggregateRoot
   {
     var conversation = GetActiveConversation();
     conversation?.AddUserMessage(content);
+  }
+
+  public string GetBotGeneratedMessage()
+  {
+    var conversation = GetActiveConversation();
+    return conversation!.GetBotGeneratedMessage();
   }
 
   // Required for EF

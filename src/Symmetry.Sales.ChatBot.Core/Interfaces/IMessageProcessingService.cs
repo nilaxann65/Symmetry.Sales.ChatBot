@@ -5,8 +5,6 @@ namespace Symmetry.Sales.ChatBot.Core.Interfaces;
 
 public interface IMessageProcessingService
 {
-  public Task<Result<string>> ProcessMessageAsync(Conversation conversation, CancellationToken ct);
-
   public Task<Result<Message>> GenerateMessageAsync(
     Conversation conversation,
     string model,

@@ -1,14 +1,16 @@
 ﻿using Ardalis.Result;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.Google;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
 
-namespace Symmetry.Sales.ChatBot.Infrastructure;
+namespace Symmetry.Sales.ChatBot.Infrastructure.Services.SemanticKernel;
 
-public class SemanticKernelService(IChatCompletionService chatCompletionService)
-  : IMessageProcessingService
+public class SemanticKernelService( /*IChatCompletionService chatCompletionService,*/
+  Kernel kernel
+) : IMessageProcessingService
 {
   public async Task<Result<Message>> GenerateMessageAsync(
     Conversation conversation,
@@ -16,20 +18,35 @@ public class SemanticKernelService(IChatCompletionService chatCompletionService)
     CancellationToken ct
   )
   {
-    var result = await chatCompletionService.GetChatMessageContentAsync(
-      Map(conversation),
-      new() { ModelId = model },
-      cancellationToken: ct
-    );
+    try
+    {
+      var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
-    return result is null || result.Content == string.Empty
-      ? Result<Message>.CriticalError($"Error generating message with model {model}")
-      : Result<Message>.Success(Map(result));
-  }
+      var request = Map(conversation);
+#pragma warning disable SKEXP0070 // Este tipo se incluye solo con fines de evaluación y está sujeto a cambios o a que se elimine en próximas actualizaciones. Suprima este diagnóstico para continuar.
+      GeminiPromptExecutionSettings geminiAIPromptExecutionSettings =
+        new()
+        {
+          ToolCallBehavior = GeminiToolCallBehavior.AutoInvokeKernelFunctions,
+          ModelId = model
+        };
+#pragma warning restore SKEXP0070 // Este tipo se incluye solo con fines de evaluación y está sujeto a cambios o a que se elimine en próximas actualizaciones. Suprima este diagnóstico para continuar.
 
-  public Task<Result<string>> ProcessMessageAsync(Conversation conversation, CancellationToken ct)
-  {
-    throw new NotImplementedException();
+      var result = await chatCompletionService.GetChatMessageContentAsync(
+        request,
+        geminiAIPromptExecutionSettings,
+        kernel,
+        cancellationToken: ct
+      );
+
+      return result is null || result.Content == string.Empty
+        ? Result<Message>.CriticalError($"Error generating message with model {model}")
+        : Result<Message>.Success(Map(result));
+    }
+    catch (Exception ex)
+    {
+      return new Message(ex.Message, MessageSender.Bot);
+    }
   }
 
   private ChatHistory Map(Conversation conversation) =>
