@@ -1,4 +1,5 @@
 ﻿using Ardalis.Result;
+using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
@@ -8,9 +9,8 @@ using Symmetry.Sales.ChatBot.Core.Interfaces;
 
 namespace Symmetry.Sales.ChatBot.Infrastructure.Services.SemanticKernel;
 
-public class SemanticKernelService( /*IChatCompletionService chatCompletionService,*/
-  Kernel kernel
-) : IMessageProcessingService
+public class SemanticKernelService(Kernel kernel, ILogger<SemanticKernelService> logger)
+  : IMessageProcessingService
 {
   public async Task<Result<Message>> GenerateMessageAsync(
     Conversation conversation,
@@ -23,14 +23,14 @@ public class SemanticKernelService( /*IChatCompletionService chatCompletionServi
       var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
       var request = Map(conversation);
-#pragma warning disable SKEXP0070 // Este tipo se incluye solo con fines de evaluación y está sujeto a cambios o a que se elimine en próximas actualizaciones. Suprima este diagnóstico para continuar.
+#pragma warning disable SKEXP0070
       GeminiPromptExecutionSettings geminiAIPromptExecutionSettings =
         new()
         {
           ToolCallBehavior = GeminiToolCallBehavior.AutoInvokeKernelFunctions,
           ModelId = model
         };
-#pragma warning restore SKEXP0070 // Este tipo se incluye solo con fines de evaluación y está sujeto a cambios o a que se elimine en próximas actualizaciones. Suprima este diagnóstico para continuar.
+#pragma warning restore SKEXP0070
 
       var result = await chatCompletionService.GetChatMessageContentAsync(
         request,
@@ -39,9 +39,15 @@ public class SemanticKernelService( /*IChatCompletionService chatCompletionServi
         cancellationToken: ct
       );
 
-      return result is null || result.Content == string.Empty
-        ? Result<Message>.CriticalError($"Error generating message with model {model}")
-        : Result<Message>.Success(Map(result));
+      if (result is null || result.Content == string.Empty)
+        return Result<Message>.CriticalError($"Error generating message with model {model}");
+
+      logger.LogInformation(
+        "Message generated successfully, {tokens} tokens used",
+        result.Metadata?.FirstOrDefault(x => x.Key == "TotalTokenCount").Value?.ToString()
+      );
+
+      return Result<Message>.Success(Map(result));
     }
     catch (Exception ex)
     {

@@ -16,7 +16,10 @@
     <PackageReference Include="FastEndpoints.Swagger" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" PrivateAssets="All" />
     <PackageReference Include="Serilog.AspNetCore" />
