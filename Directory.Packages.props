@@ -40,6 +40,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageVersion Include="Microsoft.SemanticKernel" Version="1.37.0" />
     <PackageVersion Include="Microsoft.SemanticKernel.Connectors.Google" Version="1.37.0-alpha" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.37.0-preview" />
     <PackageVersion Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
     <PackageVersion Include="NSubstitute" Version="5.1.0" />

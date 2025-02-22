@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
 
@@ -56,7 +55,7 @@ public class SemanticKernelService(Kernel kernel, ILogger<SemanticKernelService>
   }
 
   private ChatHistory Map(Conversation conversation) =>
-    new(conversation.Messages.Select(s => new ChatMessageContent(Map(s.Sender), s.Content)));
+    [.. conversation.Messages.Select(s => new ChatMessageContent(Map(s.Sender), s.Content))];
 
   private AuthorRole Map(MessageSender sender)
   {

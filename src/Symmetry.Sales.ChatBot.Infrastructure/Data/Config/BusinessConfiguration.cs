@@ -12,6 +12,7 @@ internal class BusinessConfiguration : IEntityTypeConfiguration<Business>
 
     builder.Property(p => p.Description).IsRequired();
 
+    builder.Ignore(p => p.Products);
     builder
       .HasMany(p => p.Contacts)
       .WithOne()

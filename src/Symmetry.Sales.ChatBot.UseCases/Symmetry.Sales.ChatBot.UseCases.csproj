@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Symmetry.Sales.ChatBot.Core\Symmetry.Sales.ChatBot.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Business\" />
+  </ItemGroup>
+
 </Project>

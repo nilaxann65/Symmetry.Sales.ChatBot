@@ -4,13 +4,18 @@ using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
+using Microsoft.SemanticKernel.Connectors.Qdrant;
+using Qdrant.Client;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
 using Symmetry.Sales.ChatBot.Infrastructure.Data;
 using Symmetry.Sales.ChatBot.Infrastructure.Email;
 using Symmetry.Sales.ChatBot.Infrastructure.SemanticServices;
+using Symmetry.Sales.ChatBot.Infrastructure.SemanticServices.Entities;
+using Symmetry.Sales.ChatBot.Infrastructure.SemanticServices.Services;
 using Symmetry.Sales.ChatBot.Infrastructure.Services.MessagingServices.WhatsappService;
 using Symmetry.Sales.ChatBot.Infrastructure.Services.Meta.Config;
 using Symmetry.Sales.ChatBot.Infrastructure.Services.SemanticKernel;
@@ -88,9 +93,7 @@ public static class InfrastructureServiceExtensions
       return new GoogleAIGeminiChatCompletionService(models.Chat, geminiApiKey);
     });
 #pragma warning disable SKEXP0001
-    //var memory = new MemoryBuilder()
-    //  .WithGoogleAITextEmbeddingGeneration("text-embedding-004", geminiApiKey)
-    //  .Build();
+    services.AddGoogleAIEmbeddingGeneration("text-embedding-004", geminiApiKey);
 #pragma warning restore SKEXP0001
 #pragma warning restore SKEXP0070
     //#endregion
@@ -107,6 +110,18 @@ public static class InfrastructureServiceExtensions
       return new Kernel(sp, pluginCollection);
     });
 
+    #endregion
+
+    #region Vector Stores
+    services.AddTransient<IProductService, QdrantProductService>();
+
+    var vectorStore = new QdrantVectorStore(new QdrantClient("localhost"));
+    services.AddTransient(sp => vectorStore);
+    var productCollection = vectorStore.GetCollection<Guid, ProductEntity>("SKProducts");
+
+    services.AddTransient<IVectorStoreRecordCollection<Guid, ProductEntity>>(sp =>
+      productCollection
+    );
     #endregion
 
     services.AddTransient<IMessageProcessingService, SemanticKernelService>();
