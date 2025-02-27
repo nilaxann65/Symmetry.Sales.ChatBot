@@ -42,7 +42,7 @@ public class QdrantProductService(
       Description = description,
       Price = price,
       Tags = tags,
-      Embedding = textEmbedding.ToArray()
+      Embedding = textEmbedding.ToArray(),
     };
 
     var upsertResult = await productCollection.UpsertAsync(newProduct, cancellationToken: ct);
@@ -77,7 +77,7 @@ public class QdrantProductService(
     var vectorSearchOptions = new VectorSearchOptions
     {
       Filter = new VectorSearchFilter().EqualTo(nameof(ProductEntity.BusinessId), 1), //TODO hacer dinamico el businessId
-      Top = 5
+      Top = 5,
     };
 
     var results = await productCollection.VectorizedSearchAsync(

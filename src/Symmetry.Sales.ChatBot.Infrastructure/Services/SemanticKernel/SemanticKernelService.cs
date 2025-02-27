@@ -23,12 +23,11 @@ public class SemanticKernelService(Kernel kernel, ILogger<SemanticKernelService>
 
       var request = Map(conversation);
 #pragma warning disable SKEXP0070
-      GeminiPromptExecutionSettings geminiAIPromptExecutionSettings =
-        new()
-        {
-          ToolCallBehavior = GeminiToolCallBehavior.AutoInvokeKernelFunctions,
-          ModelId = model
-        };
+      GeminiPromptExecutionSettings geminiAIPromptExecutionSettings = new()
+      {
+        ToolCallBehavior = GeminiToolCallBehavior.AutoInvokeKernelFunctions,
+        ModelId = model,
+      };
 #pragma warning restore SKEXP0070
 
       var result = await chatCompletionService.GetChatMessageContentAsync(
@@ -65,7 +64,7 @@ public class SemanticKernelService(Kernel kernel, ILogger<SemanticKernelService>
       MessageSender.Bot => AuthorRole.Assistant,
       MessageSender.System => AuthorRole.System,
       MessageSender.Function => AuthorRole.Tool,
-      _ => AuthorRole.User
+      _ => AuthorRole.User,
     };
   }
 
@@ -76,7 +75,7 @@ public class SemanticKernelService(Kernel kernel, ILogger<SemanticKernelService>
       "assistant" => MessageSender.Bot,
       "system" => MessageSender.System,
       "tool" => MessageSender.Function,
-      _ => MessageSender.User
+      _ => MessageSender.User,
     };
 
   private Message Map(ChatMessageContent chatMessageContent) =>

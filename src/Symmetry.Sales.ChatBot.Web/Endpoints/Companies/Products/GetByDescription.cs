@@ -1,5 +1,4 @@
-﻿using System;
-using FastEndpoints;
+﻿using FastEndpoints;
 using MediatR;
 using Symmetry.Sales.ChatBot.UseCases.Companies.Products.GetByDescription;
 

@@ -115,7 +115,7 @@ public static class InfrastructureServiceExtensions
     #region Vector Stores
     services.AddTransient<IProductService, QdrantProductService>();
 
-    var vectorStore = new QdrantVectorStore(new QdrantClient("localhost"));
+    var vectorStore = new QdrantVectorStore(new QdrantClient("192.168.0.18"));
     services.AddTransient(sp => vectorStore);
     var productCollection = vectorStore.GetCollection<Guid, ProductEntity>("SKProducts");
 

@@ -1,16 +1,12 @@
 ﻿using System.ComponentModel;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Embeddings;
 using Symmetry.Sales.ChatBot.Core.BusinessAggregate;
+using Symmetry.Sales.ChatBot.Core.Interfaces;
 
 namespace Symmetry.Sales.ChatBot.Infrastructure.SemanticServices;
 
 [Description("Representa el inventario")]
-#pragma warning disable SKEXP0001
-public class InventoryPlugin
-#pragma warning restore SKEXP0001
+public class InventoryPlugin(IProductService productService)
 {
   [KernelFunction("get_products")]
   [Description("Get the products availables for sale")]
@@ -20,9 +16,15 @@ public class InventoryPlugin
   }
 
   [KernelFunction("get_product_by_name")]
-  [Description("Get a product by its name, if it doesnt exists, returns null")]
-  public string GetProductByName(string name)
+  [Description(
+    "Get a product by its name, if it doesnt exists, you will get a null and have to tell the user we dont have it"
+  )]
+  public async Task<IProduct?> GetProductByName(string name)
   {
-    return "el producto es muy delicioso";
+    var result = await productService.GetProductByDescriptionAsync(name);
+    if (result.IsSuccess)
+      return result.Value;
+
+    return null;
   }
 }

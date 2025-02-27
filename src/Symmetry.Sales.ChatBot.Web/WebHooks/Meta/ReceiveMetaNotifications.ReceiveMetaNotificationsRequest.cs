@@ -2,7 +2,7 @@
 
 public class ReceiveMetaNotificationsRequest
 {
-  public static string Route = "/webhook";
+  public static string Route = "meta/webhook";
   public string Object { get; set; } = string.Empty;
   public IEnumerable<Entry> Entry { get; set; } = [];
 }

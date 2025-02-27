@@ -4,7 +4,7 @@ namespace Symmetry.Sales.ChatBot.Web.WebHooks.Meta;
 
 public class VerifyRequest
 {
-  public static string Route = "/webhook";
+  public static string Route = "meta/webhook";
 
   [BindFrom("hub.mode")]
   public string Mode { get; set; } = string.Empty;
