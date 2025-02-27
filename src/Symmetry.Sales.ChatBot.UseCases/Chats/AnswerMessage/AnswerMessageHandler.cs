@@ -1,5 +1,4 @@
-﻿using System.Transactions;
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using MediatR;
 using Symmetry.Sales.ChatBot.Core.BusinessAggregate;
@@ -7,6 +6,7 @@ using Symmetry.Sales.ChatBot.Core.BusinessAggregate.Specifications;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate.Specifications;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
+using Symmetry.Sales.ChatBot.Core.Utils;
 using Symmetry.Sales.ChatBot.UseCases.Chats.StartChat;
 using Symmetry.Sales.ChatBot.UseCases.Messages.Generate;
 
@@ -32,8 +32,10 @@ internal class AnswerMessageHandler(
     if (business is null)
       return Result.NotFound("Business not found");
 
+    ContextAccesor.CurrentTenantId = business.Id;
+
     var chat = await chatRepository.FirstOrDefaultAsync(
-      new GetChatByContactIdSpec(request.sender, request.channel, business.Id),
+      new GetChatByContactIdSpec(request.sender, request.channel),
       cancellationToken
     );
 
