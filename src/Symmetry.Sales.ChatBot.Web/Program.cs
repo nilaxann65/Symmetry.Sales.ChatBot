@@ -132,7 +132,7 @@ void ConfigureMediatR()
   var mediatRAssemblies = new[]
   {
     Assembly.GetAssembly(typeof(Chat)), // Core
-    Assembly.GetAssembly(typeof(StartChatCommand)) // UseCases
+    Assembly.GetAssembly(typeof(StartChatCommand)), // UseCases
   };
   builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!));
   builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));

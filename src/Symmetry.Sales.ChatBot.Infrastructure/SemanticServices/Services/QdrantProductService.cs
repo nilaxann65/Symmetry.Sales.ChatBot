@@ -34,12 +34,13 @@ public class QdrantProductService(
       cancellationToken: ct
     );
     logger.LogInformation("Embedding generated");
+    var tenantId = ContextAccesor.CurrentTenantId == 0 ? 1 : ContextAccesor.CurrentTenantId; //TODO remove
 
     var newProduct = new ProductEntity
     {
       Id = id,
       Name = name,
-      BusinessId = ContextAccesor.CurrentTenantId,
+      BusinessId = tenantId,
       Description = description,
       Price = price,
       Tags = tags,
@@ -90,7 +91,7 @@ public class QdrantProductService(
       cancellationToken: ct
     );
 
-    if (results.TotalCount == 0)
+    if (results.TotalCount == 0 || results.TotalCount is null)
     {
       logger.LogInformation("No products found for description {description}", description);
       return Result<IProduct>.NotFound();
