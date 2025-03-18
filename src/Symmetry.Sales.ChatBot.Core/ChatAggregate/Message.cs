@@ -26,5 +26,5 @@ public enum MessageSender
   User,
   Bot,
   System,
-  Function
+  Function,
 }

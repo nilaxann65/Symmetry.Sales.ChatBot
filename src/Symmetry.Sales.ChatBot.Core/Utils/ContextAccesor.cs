@@ -1,5 +1,4 @@
 using System;
-
 namespace Symmetry.Sales.ChatBot.Core.Utils;
 
 public static class ContextAccesor

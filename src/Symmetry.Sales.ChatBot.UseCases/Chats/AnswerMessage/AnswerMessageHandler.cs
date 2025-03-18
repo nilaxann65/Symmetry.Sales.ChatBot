@@ -1,5 +1,4 @@
-﻿using System.Transactions;
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using MediatR;
 using Symmetry.Sales.ChatBot.Core.BusinessAggregate;
