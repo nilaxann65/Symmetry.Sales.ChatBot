@@ -40,7 +40,7 @@ public class QdrantProductService(
     {
       Id = id,
       Name = name,
-      BusinessId = tenantId,
+      BusinessId = ContextAccesor.CurrentTenantId,
       Description = description,
       Price = price,
       Tags = tags,

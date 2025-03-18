@@ -40,6 +40,7 @@ public class ReceiveMetaNotifications(IMediator mediator, ILogger<ReceiveMetaNot
                   "Message received from {Wa_Id}",
                   change.Value.Contacts.First().Wa_Id
                 );
+
                 ContextAccesor.CurrentDestinataryId = change.Value.Metadata.Phone_Number_Id;
                 var command = new AnswerMessageCommand(
                   change.Value.Contacts.First().Wa_Id,

@@ -17,7 +17,7 @@ public class ChatConfiguration : IEntityTypeConfiguration<Chat>
 
     builder.Property(p => p.ContactId).HasMaxLength(64).IsRequired();
 
-    builder.HasQueryFilter(p => p.TenantId == ContextAccesor.CurrentTenantId);
+    builder.HasQueryFilter(s => s.TenantId == ContextAccesor.CurrentTenantId);
 
     builder
       .HasMany(p => p.Conversations)
