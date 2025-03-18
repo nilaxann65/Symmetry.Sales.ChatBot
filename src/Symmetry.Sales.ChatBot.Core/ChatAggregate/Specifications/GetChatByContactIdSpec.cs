@@ -5,10 +5,10 @@ namespace Symmetry.Sales.ChatBot.Core.ChatAggregate.Specifications;
 
 public class GetChatByContactIdSpec : Specification<Chat>
 {
-  public GetChatByContactIdSpec(string contactId, Channel channel, int tenantId)
+  public GetChatByContactIdSpec(string contactId, Channel channel)
   {
     Query
-      .Where(d => d.ContactId == contactId && d.Origin == channel && d.TenantId == tenantId)
+      .Where(d => d.ContactId == contactId && d.Origin == channel)
       .Include(d => d.Conversations)
       .ThenInclude(d => d.Messages);
   }

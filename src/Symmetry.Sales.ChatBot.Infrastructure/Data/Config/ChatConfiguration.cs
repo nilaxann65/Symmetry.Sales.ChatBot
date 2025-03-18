@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate;
+using Symmetry.Sales.ChatBot.Core.Utils;
 
 namespace Symmetry.Sales.ChatBot.Infrastructure.Data.Config;
 
@@ -15,6 +16,8 @@ public class ChatConfiguration : IEntityTypeConfiguration<Chat>
     builder.Property(p => p.Origin).IsRequired();
 
     builder.Property(p => p.ContactId).HasMaxLength(64).IsRequired();
+
+    builder.HasQueryFilter(s => s.TenantId == ContextAccesor.CurrentTenantId);
 
     builder
       .HasMany(p => p.Conversations)

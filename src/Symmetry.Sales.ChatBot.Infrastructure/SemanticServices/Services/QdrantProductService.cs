@@ -4,6 +4,7 @@ using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel.Embeddings;
 using Symmetry.Sales.ChatBot.Core.BusinessAggregate;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
+using Symmetry.Sales.ChatBot.Core.Utils;
 using Symmetry.Sales.ChatBot.Infrastructure.SemanticServices.Entities;
 
 namespace Symmetry.Sales.ChatBot.Infrastructure.SemanticServices.Services;
@@ -38,7 +39,7 @@ public class QdrantProductService(
     {
       Id = id,
       Name = name,
-      BusinessId = 1, //TODO cambiar
+      BusinessId = ContextAccesor.CurrentTenantId,
       Description = description,
       Price = price,
       Tags = tags,
@@ -76,7 +77,10 @@ public class QdrantProductService(
 
     var vectorSearchOptions = new VectorSearchOptions
     {
-      Filter = new VectorSearchFilter().EqualTo(nameof(ProductEntity.BusinessId), 1), //TODO hacer dinamico el businessId
+      Filter = new VectorSearchFilter().EqualTo(
+        nameof(ProductEntity.BusinessId),
+        ContextAccesor.CurrentTenantId
+      ),
       Top = 5,
     };
 

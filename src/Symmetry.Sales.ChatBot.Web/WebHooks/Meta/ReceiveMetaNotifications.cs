@@ -3,6 +3,7 @@ using FastEndpoints;
 using MediatR;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Symmetry.Sales.ChatBot.Core.Utils;
 using Symmetry.Sales.ChatBot.UseCases.Chats.AnswerMessage;
 
 namespace Symmetry.Sales.ChatBot.Web.WebHooks.Meta;
@@ -40,6 +41,7 @@ public class ReceiveMetaNotifications(IMediator mediator, ILogger<ReceiveMetaNot
                   change.Value.Contacts.First().Wa_Id
                 );
 
+                ContextAccesor.CurrentDestinataryId = change.Value.Metadata.Phone_Number_Id;
                 var command = new AnswerMessageCommand(
                   change.Value.Contacts.First().Wa_Id,
                   change.Value.Metadata.Phone_Number_Id,

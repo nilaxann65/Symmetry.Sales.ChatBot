@@ -10,12 +10,12 @@ public class Conversation : EntityBase
   public Conversation(string userMessage)
   {
     string systemInstructions =
-      "Actuaras como un agente de ventas, por favor, sigue las instrucciones del sistema. \n se conciso y directo con tus respuestas, si no sabes la respuesta, o si solicitan informacion que no tienes, ponte en contacto con el supervisor. Toda la conversacion sera en español.";
+      "Actuaras como un agente de ventas de una tienda de frutas y prendas de vestir. \n se conciso, amable y directo con tus respuestas pero no cortante. Toda la conversacion sera en español.";
 
     Messages.AddRange(
       [
         new Message(systemInstructions, MessageSender.System),
-        new Message(userMessage, MessageSender.User)
+        new Message(userMessage, MessageSender.User),
       ]
     );
   }
