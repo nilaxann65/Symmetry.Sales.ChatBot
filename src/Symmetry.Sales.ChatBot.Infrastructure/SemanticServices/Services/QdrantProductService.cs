@@ -40,7 +40,7 @@ public class QdrantProductService(
     {
       Id = id,
       Name = name,
-      BusinessId = ContextAccesor.CurrentTenantId,
+      BusinessId = tenantId,
       Description = description,
       Price = price,
       Tags = tags,
@@ -91,7 +91,7 @@ public class QdrantProductService(
       cancellationToken: ct
     );
 
-    if (results.TotalCount == 0 || results.TotalCount is null)
+    if (results.TotalCount == 0)
     {
       logger.LogInformation("No products found for description {description}", description);
       return Result<IProduct>.NotFound();
