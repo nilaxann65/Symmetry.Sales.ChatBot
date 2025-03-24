@@ -9,6 +9,7 @@ public class Business : EntityBase, IAggregateRoot
   public string Description { get; set; }
   public List<Contact> Contacts { get; private set; } = [];
   public List<IProduct> Products { get; private set; } = [];
+  public List<PaymentMethod> PaymentMethods { get; private set; } = [];
 
   public Business(string name, string? description)
   {
@@ -28,6 +29,12 @@ public class Business : EntityBase, IAggregateRoot
 
     return Result.Success();
   }
+
+  public void AddPaymentMethod(
+    string name,
+    PaymentMethodType paymentMethodType,
+    string paymentDetails
+  ) => PaymentMethods.Add(new PaymentMethod(name, paymentMethodType, paymentDetails));
 
   // Required for EF
   private Business()

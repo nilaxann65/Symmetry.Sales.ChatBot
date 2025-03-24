@@ -61,8 +61,6 @@ bld/
 *.nuget
 .nuget/
 
-# Entity Framework Core migration files
-Migrations/
 
 # Bundle output from webpack, rollup, etc.
 /dist/

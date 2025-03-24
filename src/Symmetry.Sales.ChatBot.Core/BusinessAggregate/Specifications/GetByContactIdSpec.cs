@@ -8,6 +8,7 @@ public class GetByContactIdSpec : SingleResultSpecification<Business>
   {
     Query
       .Include(s => s.Contacts)
+      .Include(s => s.PaymentMethods)
       .Where(s => s.Contacts.Any(c => c.ContactId == contactId && c.ContactOrigin == channel));
   }
 }

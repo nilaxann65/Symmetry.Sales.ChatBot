@@ -18,5 +18,11 @@ internal class BusinessConfiguration : IEntityTypeConfiguration<Business>
       .WithOne()
       .HasForeignKey("BusinessId")
       .OnDelete(DeleteBehavior.Cascade);
+
+    builder
+      .HasMany(p => p.PaymentMethods)
+      .WithOne()
+      .HasForeignKey("BusinessId")
+      .OnDelete(DeleteBehavior.Cascade);
   }
 }

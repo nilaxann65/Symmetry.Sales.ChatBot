@@ -92,9 +92,8 @@ public static class InfrastructureServiceExtensions
     {
       return new GoogleAIGeminiChatCompletionService(models.Chat, geminiApiKey);
     });
-#pragma warning disable SKEXP0001
+
     services.AddGoogleAIEmbeddingGeneration("text-embedding-004", geminiApiKey);
-#pragma warning restore SKEXP0001
 #pragma warning restore SKEXP0070
     //#endregion
 

@@ -16,12 +16,12 @@ public class InventoryPlugin(IProductService productService, ILogger<InventoryPl
     return $"manzanas, peras, sandias";
   }
 
-  [KernelFunction("get_product_by_name")]
-  [Description("Get description, price and stock of a product by a similar name")]
-  public async Task<IProduct?> GetProductByName(string name)
+  [KernelFunction("get_product_by_description")]
+  [Description("Get description, price and stock of a product by a description ")]
+  public async Task<IProduct?> GetProductByDescription(string description)
   {
-    logger.LogInformation("GetProductByName: {name}", name);
-    var result = await productService.GetProductByDescriptionAsync(name);
+    logger.LogInformation("GetProductByName: {description}", description);
+    var result = await productService.GetProductByDescriptionAsync(description);
     if (result.IsSuccess)
       return result.Value;
 
