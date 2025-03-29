@@ -9,6 +9,8 @@
     <PackageReference Include="Ardalis.Specification" />
     <PackageReference Include="Destructurama.Attributed" />
     <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.SemanticKernel" />
+    <PackageReference Include="SemanticFlow" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Serilog.AspNetCore" />
   </ItemGroup>

@@ -7,7 +7,6 @@ public interface IMessageProcessingService
 {
   public Task<Result<Message>> GenerateMessageAsync(
     Conversation conversation,
-    string model,
     CancellationToken ct
   );
 }

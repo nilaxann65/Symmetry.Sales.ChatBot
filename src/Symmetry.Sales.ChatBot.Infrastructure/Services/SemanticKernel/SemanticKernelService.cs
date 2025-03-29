@@ -1,8 +1,12 @@
-﻿using Ardalis.Result;
+﻿using System.Text.Json;
+using Ardalis.Result;
+using Azure.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
+using SemanticFlow.Extensions;
+using SemanticFlow.Services;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
 
@@ -13,32 +17,49 @@ public class SemanticKernelService(Kernel kernel, ILogger<SemanticKernelService>
 {
   public async Task<Result<Message>> GenerateMessageAsync(
     Conversation conversation,
-    string model,
     CancellationToken ct
   )
   {
     try
     {
-      var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+      var chatId = "1";
 
+      var workflowService = kernel.GetRequiredService<WorkflowService>();
+
+      var currentActivity = workflowService.GetCurrentActivity(chatId, kernel)!;
+
+      logger.LogInformation(
+        "Generating message with model {model} for activity {activity}",
+        currentActivity.PromptExecutionSettings.ModelId,
+        currentActivity.GetType().Name
+      );
+
+      var systemPrompt =
+        currentActivity.SystemPrompt
+        + " ### "
+        + workflowService.WorkflowState.DataFrom(chatId).ToPromptString();
+      logger.LogInformation("SystemPrompt: {systemPrompt}", systemPrompt);
+      conversation.ModifySystemInstructions(systemPrompt);
+
+      logger.LogInformation(
+        "Conversation messages: {messages}",
+        JsonSerializer.Serialize(conversation.Messages)
+      );
       var request = Map(conversation);
-#pragma warning disable SKEXP0070
-      GeminiPromptExecutionSettings geminiAIPromptExecutionSettings = new()
-      {
-        ToolCallBehavior = GeminiToolCallBehavior.AutoInvokeKernelFunctions,
-        ModelId = model,
-      };
-#pragma warning restore SKEXP0070
 
-      var result = await chatCompletionService.GetChatMessageContentAsync(
+      var chatCompletion = kernel.GetChatCompletionForActivity(currentActivity);
+
+      var result = await chatCompletion.GetChatMessageContentAsync(
         request,
-        geminiAIPromptExecutionSettings,
+        currentActivity.PromptExecutionSettings,
         kernel,
-        cancellationToken: ct
+        ct
       );
 
       if (result is null || result.Content == string.Empty)
-        return Result<Message>.CriticalError($"Error generating message with model {model}");
+        return Result<Message>.CriticalError(
+          $"Error generating message with model {currentActivity.PromptExecutionSettings.ModelId}"
+        );
 
       logger.LogInformation(
         "Message generated successfully, {tokens} tokens used",

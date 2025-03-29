@@ -4,10 +4,8 @@ using Symmetry.Sales.ChatBot.Core.Interfaces;
 
 namespace Symmetry.Sales.ChatBot.UseCases.Messages.Generate;
 
-public class GenerateMessageHandler(
-  IMessageProcessingService messageProcessingService,
-  IModels models
-) : ICommandHandler<GenerateMessageCommand, Result<string>>
+public class GenerateMessageHandler(IMessageProcessingService messageProcessingService)
+  : ICommandHandler<GenerateMessageCommand, Result<string>>
 {
   public async Task<Result<string>> Handle(
     GenerateMessageCommand request,
@@ -16,7 +14,6 @@ public class GenerateMessageHandler(
   {
     var messageCompletionResult = await messageProcessingService.GenerateMessageAsync(
       request.chat.GetActiveConversation()!,
-      models.Chat,
       cancellationToken
     );
 

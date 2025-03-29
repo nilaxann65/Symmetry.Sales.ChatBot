@@ -17,5 +17,6 @@ public class PaymentMethodPlugin
       PaymentMethodType.PayPal,
       "Cuenta: 77272888373 Destinatario: JOSE ARMANDO VARGAS AGUANTA Banco: Bancosol"
     );
+    
   }
 }

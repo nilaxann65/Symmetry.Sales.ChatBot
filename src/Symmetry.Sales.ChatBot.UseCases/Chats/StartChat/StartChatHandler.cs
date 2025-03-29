@@ -6,7 +6,7 @@ using Symmetry.Sales.ChatBot.Core.Interfaces;
 
 namespace Symmetry.Sales.ChatBot.UseCases.Chats.StartChat;
 
-public class StartChatHandler(IMessageProcessingService messageProcessingService, IModels models)
+public class StartChatHandler(IMessageProcessingService messageProcessingService)
   : ICommandHandler<StartChatCommand, Result<Chat>>
 {
   public async Task<Result<Chat>> Handle(
@@ -20,7 +20,6 @@ public class StartChatHandler(IMessageProcessingService messageProcessingService
 
     var messageCompletionResult = await messageProcessingService.GenerateMessageAsync(
       chat.GetActiveConversation()!,
-      models.Chat,
       cancellationToken
     );
 

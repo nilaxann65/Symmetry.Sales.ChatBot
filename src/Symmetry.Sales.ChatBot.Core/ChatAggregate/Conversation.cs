@@ -20,6 +20,15 @@ public class Conversation : EntityBase
     );
   }
 
+  public void ModifySystemInstructions(string instructions)
+  {
+    var systemMessageIndex = Messages.FindIndex(d => d.Sender == MessageSender.System);
+    if (systemMessageIndex != -1)
+    {
+      Messages[systemMessageIndex] = new Message(instructions, MessageSender.System);
+    }
+  }
+
   public string GetBotGeneratedMessage() =>
     Messages.LastOrDefault(d => d.Sender == MessageSender.Bot)?.Content ?? string.Empty;
 

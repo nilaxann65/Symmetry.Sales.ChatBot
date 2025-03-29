@@ -4,16 +4,13 @@ using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.Google;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
 using Qdrant.Client;
 using Symmetry.Sales.ChatBot.Core.Interfaces;
+using Symmetry.Sales.ChatBot.Core.Services;
 using Symmetry.Sales.ChatBot.Infrastructure.Data;
 using Symmetry.Sales.ChatBot.Infrastructure.Email;
-using Symmetry.Sales.ChatBot.Infrastructure.SemanticServices;
 using Symmetry.Sales.ChatBot.Infrastructure.SemanticServices.Entities;
 using Symmetry.Sales.ChatBot.Infrastructure.SemanticServices.Services;
 using Symmetry.Sales.ChatBot.Infrastructure.Services.MessagingServices.WhatsappService;
@@ -74,10 +71,6 @@ public static class InfrastructureServiceExtensions
     IConfiguration configuration
   )
   {
-    services.AddSingleton<IModels, Models>();
-
-    //#region models
-    var models = services.BuildServiceProvider().GetRequiredService<IModels>();
     Dictionary<string, SemanticKernelDetailOptions> options = configuration
       .GetSection("SemanticKernelModels")
       .Get<Dictionary<string, SemanticKernelDetailOptions>>()!;
@@ -86,30 +79,20 @@ public static class InfrastructureServiceExtensions
 
     string deepseekApiKey = options.GetValueOrDefault("deepseek")?.ApiKey!;
 
+    services.AddSingleton<IModels, Models>();
+
 #pragma warning disable SKEXP0070
 
-    services.AddSingleton<IChatCompletionService>(sp =>
-    {
-      return new GoogleAIGeminiChatCompletionService(models.Chat, geminiApiKey);
-    });
+    services
+      .AddKernel()
+      .AddGoogleAIGeminiChatCompletion("gemini-2.0-flash", geminiApiKey)
+      .AddGoogleAIGeminiChatCompletion("gemini-2.0-flash-lite", geminiApiKey)
+      .AddGoogleAIEmbeddingGeneration("text-embedding-004", geminiApiKey);
 
-    services.AddGoogleAIEmbeddingGeneration("text-embedding-004", geminiApiKey);
+    services.AddConversationFlow();
+
+    services.AddModels();
 #pragma warning restore SKEXP0070
-    //#endregion
-
-    #region Plugins
-
-    services.AddSingleton<InventoryPlugin>();
-
-    services.AddTransient(sp =>
-    {
-      KernelPluginCollection pluginCollection = [];
-      pluginCollection.AddFromObject(sp.GetRequiredService<InventoryPlugin>());
-
-      return new Kernel(sp, pluginCollection);
-    });
-
-    #endregion
 
     #region Vector Stores
     services.AddTransient<IProductService, QdrantProductService>();
@@ -118,9 +101,7 @@ public static class InfrastructureServiceExtensions
     services.AddTransient(sp => vectorStore);
     var productCollection = vectorStore.GetCollection<Guid, ProductEntity>("SKProducts");
 
-    services.AddTransient<IVectorStoreRecordCollection<Guid, ProductEntity>>(sp =>
-      productCollection
-    );
+    services.AddTransient(sp => productCollection);
     #endregion
 
     services.AddTransient<IMessageProcessingService, SemanticKernelService>();
