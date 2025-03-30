@@ -9,8 +9,7 @@ public class Conversation : EntityBase
 
   public Conversation(string userMessage)
   {
-    string systemInstructions =
-      "Actuaras como un agente de ventas de una tienda de frutas y prendas de vestir. \n se conciso, amable y directo con tus respuestas pero no cortante. Toda la conversacion sera en español.";
+    string systemInstructions = "Default Message";
 
     Messages.AddRange(
       [

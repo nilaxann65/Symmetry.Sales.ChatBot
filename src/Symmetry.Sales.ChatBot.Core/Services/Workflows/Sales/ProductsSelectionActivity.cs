@@ -41,13 +41,11 @@ public class ProductsSelectionActivity(
   [return: Description(
     "A confirmation message indicating the products names, quantities and total price."
   )]
-  public string ConfirmProductSelection(
-    [Description("The full list of products the customer ordered")] string productSelection
-  )
+  public string ConfirmProductSelection()
   {
     string chatId = "1";
 
-    var nextActivity = workflowService.CompleteActivity(chatId, productSelection, kernel)!;
+    var nextActivity = workflowService.CompleteActivity(chatId, kernel)!;
 
     return @$"### {nextActivity.SystemPrompt} ### {workflowService.WorkflowState.DataFrom(chatId).ToPromptString()}";
   }

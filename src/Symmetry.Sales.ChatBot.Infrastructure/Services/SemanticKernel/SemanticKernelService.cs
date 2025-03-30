@@ -1,10 +1,7 @@
-﻿using System.Text.Json;
-using Ardalis.Result;
-using Azure.Core;
+﻿using Ardalis.Result;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.Google;
 using SemanticFlow.Extensions;
 using SemanticFlow.Services;
 using Symmetry.Sales.ChatBot.Core.ChatAggregate;
@@ -38,13 +35,9 @@ public class SemanticKernelService(Kernel kernel, ILogger<SemanticKernelService>
         currentActivity.SystemPrompt
         + " ### "
         + workflowService.WorkflowState.DataFrom(chatId).ToPromptString();
-      logger.LogInformation("SystemPrompt: {systemPrompt}", systemPrompt);
+
       conversation.ModifySystemInstructions(systemPrompt);
 
-      logger.LogInformation(
-        "Conversation messages: {messages}",
-        JsonSerializer.Serialize(conversation.Messages)
-      );
       var request = Map(conversation);
 
       var chatCompletion = kernel.GetChatCompletionForActivity(currentActivity);
