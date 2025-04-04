@@ -18,6 +18,7 @@ public static class ConversationFlowRegistryExtension
       .AddKernelWorkflow()
       .StartWith<ProductsSelectionActivity>()
       .Then<CustomerIdentificationActivity>()
-      .EndsWith<PaymentSelectionActivity>();
+      .Then<PaymentSelectionActivity>()
+      .EndsWith<OrderConfirmationActivity>();
   }
 }

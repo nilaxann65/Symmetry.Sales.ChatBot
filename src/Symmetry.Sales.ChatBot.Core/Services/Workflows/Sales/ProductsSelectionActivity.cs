@@ -16,14 +16,18 @@ public class ProductsSelectionActivity(
 ) : IActivity
 {
   public string SystemPrompt { get; set; } =
-    " Estas atendiendo una tienda de abarrotes a travez del chat de la empresa con los clientes. /n Tu tarea es ayudar al cliente a seleccionar los productos que desea comprar, debes pedirle el nombre del producto y la cantidad que desea comprar, debes indicarle al cliente en todo momento el precio de los productos y brindarle una pequena descripcion de los mismos.";
+    """
+Estas atendiendo una tienda de abarrotes a travez del chat de la empresa con los clientes. /n Tu tarea es ayudar al cliente a seleccionar los productos que desea comprar, debes pedirle el nombre del producto y la cantidad que desea comprar, debes indicarle al cliente en todo momento el precio de los productos y brindarle una pequena descripcion de los mismos.
+""";
   public PromptExecutionSettings PromptExecutionSettings { get; set; } = promptExecutionSettings;
 
   [KernelFunction("find_product_by_description")]
   [Description("Find the nearest product by description")]
   [return: Description("A JSON string with the product basic data")]
   public async Task<string> GetProductByDescription(
-    [Description("The product description (dont need to be specific, also allows product names)")]
+    [Description(
+      "an ambigous product description (dont need to be specific, also allows product names)"
+    )]
       string description
   )
   {

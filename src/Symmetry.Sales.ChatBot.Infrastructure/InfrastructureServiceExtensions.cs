@@ -79,8 +79,6 @@ public static class InfrastructureServiceExtensions
 
     string deepseekApiKey = options.GetValueOrDefault("deepseek")?.ApiKey!;
 
-    services.AddSingleton<IModels, Models>();
-
 #pragma warning disable SKEXP0070
 
     services
@@ -90,7 +88,6 @@ public static class InfrastructureServiceExtensions
       .AddGoogleAIEmbeddingGeneration("text-embedding-004", geminiApiKey);
 
     services.AddConversationFlow();
-
     services.AddModels();
 #pragma warning restore SKEXP0070
 
